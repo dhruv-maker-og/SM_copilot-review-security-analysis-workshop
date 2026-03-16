@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "bash": ".github/hooks/scripts/log-context.sh",
+        "powershell": "powershell -ExecutionPolicy Bypass -File .github/hooks/scripts/log-context.ps1",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
