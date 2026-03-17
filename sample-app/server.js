@@ -49,14 +49,12 @@ try {
 
 app.get("/api/users/search", (req, res) => {
   const username = req.query.username;
-  // BAD: Direct string interpolation in SQL query
-  const query = `SELECT id, username, email, role FROM users WHERE username = '${username}'`;
+  // FIXED: Parameterized query prevents SQL injection (CWE-89)
   try {
-    const rows = db.prepare(query).all();
+    const rows = db.prepare("SELECT id, username, email, role FROM users WHERE username = ?").all(username);
     res.json(rows);
   } catch (err) {
-    // VULNERABILITY: Leaking error details to client
-    res.status(500).json({ error: err.message, query: query });
+    res.status(500).json({ error: "Search failed" });
   }
 });
 
