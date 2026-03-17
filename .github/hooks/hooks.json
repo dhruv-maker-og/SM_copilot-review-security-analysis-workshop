@@ -9,6 +9,24 @@
         "cwd": ".",
         "timeoutSec": 5
       }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "bash": ".github/hooks/scripts/secret-scanner.sh",
+        "powershell": "powershell -ExecutionPolicy Bypass -File .github/hooks/scripts/secret-scanner.ps1",
+        "cwd": ".",
+        "timeoutSec": 15
+      }
+    ],
+    "agentStop": [
+      {
+        "type": "command",
+        "bash": ".github/hooks/scripts/test-gate.sh",
+        "powershell": "powershell -ExecutionPolicy Bypass -File .github/hooks/scripts/test-gate.ps1",
+        "cwd": ".",
+        "timeoutSec": 30
+      }
     ]
   }
 }
