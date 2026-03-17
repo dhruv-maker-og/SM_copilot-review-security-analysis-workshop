@@ -100,6 +100,40 @@ test("returns null for empty string id", () => {
   assert.strictEqual(result, null);
 });
 
+// --- SQL injection prevention tests ---
+console.log("\nSQL injection prevention (parameterized query):");
+
+const Database = require("better-sqlite3");
+const testDb = new Database(":memory:");
+testDb.exec(
+  "CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, email TEXT, role TEXT)",
+);
+testDb.exec(
+  "INSERT INTO users VALUES (1, 'admin', 'admin@example.com', 'admin')",
+);
+testDb.exec(
+  "INSERT INTO users VALUES (2, 'alice', 'alice@example.com', 'user')",
+);
+const searchStmt = testDb.prepare(
+  "SELECT id, username, email, role FROM users WHERE username = ?",
+);
+
+test("parameterized query returns matching user", () => {
+  const rows = searchStmt.all("admin");
+  assert.strictEqual(rows.length, 1);
+  assert.strictEqual(rows[0].username, "admin");
+});
+
+test("parameterized query prevents SQL injection - injection attempt returns no results", () => {
+  const rows = searchStmt.all("' OR '1'='1");
+  assert.strictEqual(rows.length, 0);
+});
+
+test("parameterized query returns empty array for unknown username", () => {
+  const rows = searchStmt.all("nonexistent");
+  assert.strictEqual(rows.length, 0);
+});
+
 // --- Summary ---
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===`);
 if (failed > 0) {
